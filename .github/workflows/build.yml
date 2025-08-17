@@ -13,12 +13,12 @@ jobs:
           node-version: '18'
       - name: Install web deps
         run: |
-          cd web && npm ci
+          cd web && npm install
       - name: Build web
         run: cd web && npm run build
       - name: Install electron deps
         run: |
-          cd electron && npm ci
+          cd electron && npm install
       - name: Package electron
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
