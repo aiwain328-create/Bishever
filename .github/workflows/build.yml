@@ -1,0 +1,54 @@
+name: Build artifacts
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build-electron:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install web deps
+        run: |
+          cd web && npm ci
+      - name: Build web
+        run: cd web && npm run build
+      - name: Install electron deps
+        run: |
+          cd electron && npm ci
+      - name: Package electron
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: |
+          cd electron && npm run build
+      - name: Upload electron artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-dist
+          path: electron/dist
+
+  build-expo:
+    runs-on: ubuntu-latest
+    needs: build-electron
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install EAS
+        run: npm install -g eas-cli
+      - name: EAS login
+        env:
+          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+        run: eas whoami
+      - name: Trigger EAS build (android)
+        run: |
+          cd mobile
+          eas build -p android --non-interactive --profile production
+      - name: Upload placeholder (EAS artifacts available in EAS build page)
+        run: echo "Expo build triggered; download from EAS or link in build logs."
