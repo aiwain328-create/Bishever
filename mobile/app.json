@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "NimbusNotesMobile",
+    "slug": "nimbus-notes-mobile",
+    "scheme": "nimbusnotes",
+    "platforms": ["android"],
+    "android": { "package": "com.yourcompany.nimbusnotes" }
+  }
+}
